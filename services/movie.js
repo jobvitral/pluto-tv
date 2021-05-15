@@ -66,11 +66,58 @@ class MovieService
             });
 
             fs.writeFileSync(`arquivos/${categorie.filename}`, m3u8);
-            console.log(`[SUCCESSO] Categoria ${categorie.name} criado com sucesso\n`);
         });
 
         
-        console.log(`[SUCCESSO] Arquivo da lista de canais criado com sucesso\n`);
+        console.log(`[SUCCESSO] Arquivo da lista de filmes por categoria criado com sucesso\n`);
+    }
+
+    generateAll = async () => 
+    {
+        let categories = await this.getCategories();
+        let m3u8 = `#EXTM3U\n\n`;
+
+        // gera o arquivo da playlist
+        categories.forEach((categorie) => 
+        {
+            let deviceId = uuid1();
+            let sid = uuid4();
+            
+            categorie.items.forEach((movie) => 
+            {
+                let m3uUrl = new URL(movie.url);
+                let queryString = url.search;
+                let params = new URLSearchParams(queryString);
+
+                // seta os parametros da url
+                params.set('advertisingId', '');
+                params.set('appName', 'web');
+                params.set('appVersion', 'unknown');
+                params.set('appStoreUrl', '');
+                params.set('architecture', '');
+                params.set('buildVersion', '');
+                params.set('clientTime', '0');
+                params.set('deviceDNT', '0');
+                params.set('deviceId', deviceId);
+                params.set('deviceMake', 'Chrome');
+                params.set('deviceModel', 'web');
+                params.set('deviceType', 'web');
+                params.set('deviceVersion', 'unknown');
+                params.set('includeExtendedEvents', 'false');
+                params.set('sid', sid);
+                params.set('userId', '');
+                params.set('serverSideAds', 'true');
+
+                m3uUrl.search = params.toString();
+                m3uUrl = m3uUrl.toString();
+
+                m3u8 = m3u8 + `#EXTINF:0 channel-id="${movie.id}" tvg-logo="${movie.cover}" group-title="${movie.genre}", ${movie.name}\n`;
+                m3u8 = m3u8 +  `${m3uUrl}\n\n`;
+            });
+        });
+
+        fs.writeFileSync(`arquivos/filme.m3u8`, m3u8);
+        console.log(`[SUCCESSO] Arquivo da lista completa de filmes criado com sucesso\n`);
     }
 };
 

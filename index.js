@@ -17,8 +17,12 @@ const generate = async () => {
     console.log('Gerando o guia de programação');
     await guideService.generate();
 
-    console.log('Gerando lista de filmes OnDemand');
+    console.log('Gerando lista de filmes OnDemand - Separadas');
     await movieService.generate();
+
+    console.log('Gerando lista de filmes OnDemand - Geral');
+    await movieService.generateAll();
+
 
     console.log('Listas geradas com sucesso');
 }
